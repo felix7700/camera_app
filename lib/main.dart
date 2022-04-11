@@ -1,11 +1,9 @@
 import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() async {
-// Ensure that plugin services are initialized so that `availableCameras()`
-// can be called before `runApp()`
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MainApp());
 }
@@ -40,17 +38,7 @@ class _MainAppState extends State<MainApp> {
             Widget _widget;
             if (snapshot.hasData) {
               CameraDescription _cameraDescription = snapshot.data;
-              _widget = TakePictureScreen(camera: _cameraDescription)
-                  // const Icon(
-                  //   Icons.check_circle_outline,
-                  //   color: Colors.green,
-                  //   size: 60,
-                  // ),
-                  // Padding(
-                  //   padding: const EdgeInsets.only(top: 16),
-                  //   child: Text('Result: ${snapshot.data}'),
-                  // )
-                  ;
+              _widget = TakePictureScreen(camera: _cameraDescription);
             } else if (snapshot.hasError) {
               _widget = Center(
                 child: Column(
@@ -92,7 +80,6 @@ class _MainAppState extends State<MainApp> {
   }
 }
 
-// A screen that allows users to take a picture using a given camera.
 class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({
     Key? key,
@@ -108,65 +95,99 @@ class TakePictureScreen extends StatefulWidget {
 class TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
+  final _imageIndex = -1;
 
   @override
   void initState() {
     super.initState();
-    // To display the current output from the Camera,
-    // create a CameraController.
     _controller = CameraController(
-      // Get a specific camera from the list of available cameras.
       widget.camera,
-      // Define the resolution to use.
       ResolutionPreset.medium,
     );
-
-    // Next, initialize the controller. This returns a Future.
     _initializeControllerFuture = _controller.initialize();
   }
 
   @override
   void dispose() {
-    // Dispose of the controller when the widget is disposed.
+    debugPrint('\ndispose()');
     _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Fill this out in the next steps.
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           FloatingActionButton(
-            // Provide an onPressed callback.
             onPressed: () async {
-              // Take the Picture in a try / catch block. If anything goes wrong,
-              // catch the error.
               try {
-                // Ensure that the camera is initialized.
                 await _initializeControllerFuture;
 
-                // Attempt to take a picture and then get the location
-                // where the image file is saved.
                 final XFile image = await _controller.takePicture();
+
+                Directory tempDir = await getTemporaryDirectory();
+                String tempPath = tempDir.path;
+
+                Directory appDocDir = await getApplicationDocumentsDirectory();
+                String appDocPath = appDocDir.path;
+
+                debugPrint('image.path: ' + image.path);
+
+                debugPrint('tempPath: ' + tempPath);
+                debugPrint('appDocPath: ' + appDocPath);
+
+                var completePath = image.path;
+                var fileName = (completePath.split('/').last);
+                var filePath = completePath.replaceAll("/$fileName", '');
+                debugPrint('fileName: ' + fileName);
+                debugPrint('filePath: ' + filePath);
+
+                Directory _dir = Directory(tempPath);
+                final List<FileSystemEntity> entities =
+                    await _dir.list().toList();
+                // for (var entity in entities) {
+                //   debugPrint('entity.toString(): ' + entity.toString());
+                // }
+                final Iterable<File> files = entities.whereType<File>();
+                List<String> _imagesPathList = [];
+                for (var file in files) {
+                  // debugPrint('file.toString(): ' + file.toString());
+                  // var _fileName = (file.toString().split('/').last);
+                  // debugPrint('fileName: ' + _fileName);
+                  // _imagesPathList.add(file.toString());
+                  _imagesPathList.add(file.path);
+                }
+
+                debugPrint(_imagesPathList.toString());
 
                 await Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => DisplayPictureScreen(
-                      // Pass the automatically generated path to
-                      // the DisplayPictureScreen widget.
-                      imagePath: image.path,
+                      imagePath: _imagesPathList[0],
+                      // imagePath: image.path,
                     ),
                   ),
                 );
               } catch (e) {
-                // If an error occurs, log the error to the console.
                 print(e);
               }
             },
             child: const Icon(Icons.camera_alt),
+          ),
+          const SizedBox(
+            height: 48,
+          ),
+          FloatingActionButton(
+            child: const Icon(Icons.image),
+            onPressed: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => GalleryPage(),
+                ),
+              );
+            },
           )
         ],
       ),
@@ -187,6 +208,34 @@ class DisplayPictureScreen extends StatelessWidget {
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
       body: Image.file(File(imagePath)),
+    );
+  }
+}
+
+class GalleryPage extends StatelessWidget {
+  GalleryPage({Key? key}) : super(key: key);
+
+  final List<Map> myProducts =
+      List.generate(100000, (index) => {"id": index, "name": "Product $index"})
+          .toList();
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 200,
+          childAspectRatio: 3 / 2,
+          crossAxisSpacing: 20,
+          mainAxisSpacing: 20),
+      itemCount: myProducts.length,
+      itemBuilder: (BuildContext ctx, index) {
+        return Container(
+          alignment: Alignment.center,
+          child: Text(myProducts[index]["name"]),
+          decoration: BoxDecoration(
+              color: Colors.amber, borderRadius: BorderRadius.circular(15)),
+        );
+      },
     );
   }
 }
