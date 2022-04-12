@@ -212,29 +212,105 @@ class DisplayPictureScreen extends StatelessWidget {
   }
 }
 
-class GalleryPage extends StatelessWidget {
+class GalleryPage extends StatefulWidget {
   GalleryPage({Key? key}) : super(key: key);
 
+  @override
+  State<GalleryPage> createState() => _GalleryPageState();
+}
+
+class _GalleryPageState extends State<GalleryPage> {
   final List<Map> myProducts =
       List.generate(100000, (index) => {"id": index, "name": "Product $index"})
           .toList();
 
+  Future<List<String>> _getImagesPaths() async {
+    Directory tempDir = await getTemporaryDirectory();
+    String tempPath = tempDir.path;
+    Directory _dir = Directory(tempPath);
+
+    final List<FileSystemEntity> entities = await _dir.list().toList();
+    // for (var entity in entities) {
+    //   debugPrint('entity.toString(): ' + entity.toString());
+    // }
+    final Iterable<File> files = entities.whereType<File>();
+    final List<String> _imagesPathList = [];
+    for (var file in files) {
+      // debugPrint('file.toString(): ' + file.toString());
+      // var _fileName = (file.toString().split('/').last);
+      // debugPrint('fileName: ' + _fileName);
+      // _imagesPathList.add(file.toString());
+      _imagesPathList.add(file.path);
+    }
+    return _imagesPathList;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 200,
-          childAspectRatio: 3 / 2,
-          crossAxisSpacing: 20,
-          mainAxisSpacing: 20),
-      itemCount: myProducts.length,
-      itemBuilder: (BuildContext ctx, index) {
-        return Container(
-          alignment: Alignment.center,
-          child: Text(myProducts[index]["name"]),
-          decoration: BoxDecoration(
-              color: Colors.amber, borderRadius: BorderRadius.circular(15)),
-        );
+    return FutureBuilder(
+      future: _getImagesPaths(),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        Widget _widget;
+        if (snapshot.hasData) {
+          final List<String> _imagesPathList = snapshot.data;
+          _widget = Scaffold(
+            appBar: AppBar(
+              title: const Text('Bilder Gallerie'),
+            ),
+            body: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 200,
+                  childAspectRatio: 3 / 2,
+                  crossAxisSpacing: 20,
+                  mainAxisSpacing: 20),
+              itemCount: _imagesPathList.length,
+              itemBuilder: (BuildContext ctx, index) {
+                return Container(
+                  alignment: Alignment.center,
+                  // child: Text(_imagesPathList[index]),
+                  child: Image.file(File(_imagesPathList[index])),
+
+                  decoration: BoxDecoration(
+                      color: Colors.amber,
+                      borderRadius: BorderRadius.circular(15)),
+                );
+              },
+            ),
+          );
+        } else if (snapshot.hasError) {
+          _widget = Center(
+            child: Column(
+              children: [
+                const Icon(
+                  Icons.error_outline,
+                  color: Colors.red,
+                  size: 60,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Text('Error: ${snapshot.error}'),
+                )
+              ],
+            ),
+          );
+        } else {
+          _widget = Center(
+            child: Column(
+              children: const [
+                SizedBox(
+                  width: 60,
+                  height: 60,
+                  child: CircularProgressIndicator(),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 16),
+                  child: Text('Awaiting result...'),
+                )
+              ],
+            ),
+          );
+        }
+        return _widget;
       },
     );
   }
