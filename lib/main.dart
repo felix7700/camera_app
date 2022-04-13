@@ -8,7 +8,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Obtain a list of the available cameras on the device.
   final cameras = await availableCameras();
-  runApp(MyApp(cameras: cameras));
+  // runApp(MyApp(cameras: cameras));
+  runApp(MainApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -136,6 +137,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Expanded(child: CameraPreview(_controller)),
           FloatingActionButton(
             onPressed: () async {
               try {
@@ -181,7 +183,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                 await Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => DisplayPictureScreen(
-                      imagePath: _imagesPathList[0],
+                      imagePath: image.path,
                       // imagePath: image.path,
                     ),
                   ),
