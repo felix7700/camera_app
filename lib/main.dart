@@ -10,7 +10,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   cameras = await availableCameras();
-  runApp(CameraApp());
+  runApp(MaterialApp(home: CameraApp()));
+  // runApp(MaterialApp(home: GalleryPage()));
 }
 
 class CameraApp extends StatefulWidget {
@@ -44,8 +45,9 @@ class _CameraAppState extends State<CameraApp> {
     if (!controller.value.isInitialized) {
       return Container();
     }
-    return MaterialApp(
-      home: Column(
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Expanded(child: CameraPreview(controller)),
@@ -59,12 +61,31 @@ class _CameraAppState extends State<CameraApp> {
                 ),
                 FloatingActionButton(
                   backgroundColor: Colors.grey,
-                  onPressed: () {},
+                  onPressed: () async {
+                    final XFile _image = await controller.takePicture();
+                    debugPrint(
+                        'DisplayPictureScreen with path: ' + _image.path);
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => DisplayPictureScreen(
+                          imagePath: _image.path,
+                          // imagePath: image.path,
+                        ),
+                      ),
+                    );
+                  },
                   child: const Icon(Icons.camera_alt),
                 ),
                 FloatingActionButton(
                   backgroundColor: Colors.grey,
-                  onPressed: () {},
+                  onPressed: () async {
+                    debugPrint('show GalleryPage()');
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => GalleryPage(),
+                      ),
+                    );
+                  },
                   child: const Icon(Icons.image),
                 ),
               ],
@@ -145,16 +166,9 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                 Directory _dir = Directory(tempPath);
                 final List<FileSystemEntity> entities =
                     await _dir.list().toList();
-                // for (var entity in entities) {
-                //   debugPrint('entity.toString(): ' + entity.toString());
-                // }
                 final Iterable<File> files = entities.whereType<File>();
                 List<String> _imagesPathList = [];
                 for (var file in files) {
-                  // debugPrint('file.toString(): ' + file.toString());
-                  // var _fileName = (file.toString().split('/').last);
-                  // debugPrint('fileName: ' + _fileName);
-                  // _imagesPathList.add(file.toString());
                   _imagesPathList.add(file.path);
                 }
 
@@ -182,7 +196,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             onPressed: () async {
               await Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => GalleryPage(),
+                  builder: (context) => MaterialApp(home: GalleryPage()),
                 ),
               );
             },
@@ -201,11 +215,13 @@ class DisplayPictureScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Display the Picture')),
-      // The image is stored as a file on the device. Use the `Image.file`
-      // constructor with the given path to display the image.
-      body: Image.file(File(imagePath)),
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(title: const Text('Display the Picture')),
+        // The image is stored as a file on the device. Use the `Image.file`
+        // constructor with the given path to display the image.
+        body: Image.file(File(imagePath)),
+      ),
     );
   }
 }
