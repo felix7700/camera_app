@@ -1,97 +1,76 @@
+import 'dart:async';
 import 'dart:io';
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:camera/camera.dart';
 import 'package:path_provider/path_provider.dart';
-import 'camera_screen.dart';
 
-void main() async {
+List<CameraDescription>? cameras;
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Obtain a list of the available cameras on the device.
-  final cameras = await availableCameras();
-  // runApp(MyApp(cameras: cameras));
-  runApp(MainApp());
+
+  cameras = await availableCameras();
+  runApp(CameraApp());
 }
 
-class MyApp extends StatelessWidget {
-  final List<CameraDescription> cameras;
-  const MyApp({Key? key, required this.cameras}) : super(key: key);
+class CameraApp extends StatefulWidget {
+  @override
+  _CameraAppState createState() => _CameraAppState();
+}
+
+class _CameraAppState extends State<CameraApp> {
+  late CameraController controller;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Camera App',
-      home: CameraScreen(cameras: cameras),
-    );
+  void initState() {
+    super.initState();
+    controller = CameraController(cameras![0], ResolutionPreset.max);
+    controller.initialize().then((_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {});
+    });
   }
-}
-
-class MainApp extends StatefulWidget {
-  MainApp({Key? key}) : super(key: key);
 
   @override
-  State<MainApp> createState() => _MainAppState();
-}
-
-class _MainAppState extends State<MainApp> {
-  _initCameras() async {
-    debugPrint('_initCameras()');
-
-// Obtain a list of the available cameras on the device.
-    final cameras = await availableCameras();
-
-// Get a specific camera from the list of available cameras.
-    final firstCamera = cameras.first;
-    debugPrint('firstCamera: $firstCamera');
-    return firstCamera;
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!controller.value.isInitialized) {
+      return Container();
+    }
     return MaterialApp(
-      home: Scaffold(
-        body: FutureBuilder(
-          future: _initCameras(),
-          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-            Widget _widget;
-            if (snapshot.hasData) {
-              CameraDescription _cameraDescription = snapshot.data;
-              _widget = TakePictureScreen(camera: _cameraDescription);
-            } else if (snapshot.hasError) {
-              _widget = Center(
-                child: Column(
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      color: Colors.red,
-                      size: 60,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: Text('Error: ${snapshot.error}'),
-                    )
-                  ],
+      home: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Expanded(child: CameraPreview(controller)),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const SizedBox(
+                  width: 64,
                 ),
-              );
-            } else {
-              _widget = Center(
-                child: Column(
-                  children: const [
-                    SizedBox(
-                      width: 60,
-                      height: 60,
-                      child: CircularProgressIndicator(),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 16),
-                      child: Text('Awaiting result...'),
-                    )
-                  ],
+                FloatingActionButton(
+                  backgroundColor: Colors.grey,
+                  onPressed: () {},
+                  child: const Icon(Icons.camera_alt),
                 ),
-              );
-            }
-            return _widget;
-          },
-        ),
+                FloatingActionButton(
+                  backgroundColor: Colors.grey,
+                  onPressed: () {},
+                  child: const Icon(Icons.image),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -116,6 +95,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   @override
   void initState() {
+    debugPrint('TakePictureScreenState initState()');
     super.initState();
     _controller = CameraController(
       widget.camera,
