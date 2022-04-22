@@ -69,7 +69,6 @@ class _CameraAppState extends State<CameraApp> {
                       MaterialPageRoute(
                         builder: (context) => DisplayPictureScreen(
                           imagePath: _image.path,
-                          // imagePath: image.path,
                         ),
                       ),
                     );
@@ -244,16 +243,9 @@ class _GalleryPageState extends State<GalleryPage> {
     Directory _dir = Directory(tempPath);
 
     final List<FileSystemEntity> entities = await _dir.list().toList();
-    // for (var entity in entities) {
-    //   debugPrint('entity.toString(): ' + entity.toString());
-    // }
     final Iterable<File> files = entities.whereType<File>();
     final List<String> _imagesPathList = [];
     for (var file in files) {
-      // debugPrint('file.toString(): ' + file.toString());
-      // var _fileName = (file.toString().split('/').last);
-      // debugPrint('fileName: ' + _fileName);
-      // _imagesPathList.add(file.toString());
       _imagesPathList.add(file.path);
     }
     return _imagesPathList;
@@ -281,9 +273,7 @@ class _GalleryPageState extends State<GalleryPage> {
               itemBuilder: (BuildContext ctx, index) {
                 return Container(
                   alignment: Alignment.center,
-                  // child: Text(_imagesPathList[index]),
                   child: Image.file(File(_imagesPathList[index])),
-
                   decoration: BoxDecoration(
                       color: Colors.amber,
                       borderRadius: BorderRadius.circular(15)),
@@ -308,19 +298,13 @@ class _GalleryPageState extends State<GalleryPage> {
             ),
           );
         } else {
-          _widget = Center(
-            child: Column(
-              children: const [
-                SizedBox(
-                  width: 60,
-                  height: 60,
-                  child: CircularProgressIndicator(),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 16),
-                  child: Text('Awaiting result...'),
-                )
-              ],
+          _widget = const Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: 60,
+                height: 60,
+                child: CircularProgressIndicator(),
+              ),
             ),
           );
         }
