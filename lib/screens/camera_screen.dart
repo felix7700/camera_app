@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:camera_app/db_manager.dart';
 import 'package:camera_app/main.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 
 class CameraScreen extends StatefulWidget {
   @override
@@ -61,9 +65,23 @@ class _CameraScreenState extends State<CameraScreen> {
                   backgroundColor: Colors.grey,
                   onPressed: () async {
                     final XFile _image = await controller.takePicture();
-                    imagesPaths.add(_image.path);
+                    debugPrint('_image.path: ' + _image.path);
+
+                    final appDir = await getApplicationDocumentsDirectory();
+                    debugPrint('appDir.path: ' + appDir.path);
+                    final fileName = basename(_image.path);
+                    debugPrint('fileName: ' + fileName);
+
+                    String imagePath = '';
+                    if (Platform.isAndroid) {
+                      imagePath = ('${appDir.path}/../cache/$fileName');
+                    } else if (Platform.isIOS) {
+                      imagePath = ('${appDir.path}/camera/pictures/$fileName');
+                    }
+                    debugPrint('imagePath: ' + imagePath);
+
                     Map<String, dynamic> _newImageDataRow = {
-                      _dbManager.imagesColumnnameImagePath: _image.path,
+                      _dbManager.imagesColumnnameImagePath: imagePath,
                       _dbManager.imagesColumnnameImageName: null,
                       _dbManager.imagesColumnnameImageTagID: null,
                     };

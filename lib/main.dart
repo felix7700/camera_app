@@ -66,7 +66,7 @@ class _GalleryPageState extends State<GalleryPage> {
     debugPrint(
       '_imagesTableData: ' + _imagesTableData.toString(),
     );
-    final List<String> _imagesPathList = [];
+    List<String> _imagesPathList = [];
     for (var imageData in _imagesTableData) {
       _imagesPathList.add(imageData[_dbManager.imagesColumnnameImagePath]);
     }
