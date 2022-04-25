@@ -10,8 +10,8 @@ class DbManager {
 
   final String imagesTablename = 'images';
   final String imagesColumnnameImageID = 'image_id';
-  final String imagesColumnnameImagePath = 'image_path';
-  final String imagesColumnnameImageName = 'image_name';
+  final String imagesColumnnameImageFileName = 'image_filename';
+  final String imagesColumnnameImageNickName = 'image_nickname';
   final String imagesColumnnameImageTagID = 'image_tags';
 
   final String tagsTablename = 'tags';
@@ -57,8 +57,8 @@ class DbManager {
     await db.execute('''
           CREATE TABLE $imagesTablename (
             $imagesColumnnameImageID INTEGER NOT NULL UNIQUE,
-            $imagesColumnnameImagePath TEXT NOT NULL,
-            $imagesColumnnameImageName TEXT,
+            $imagesColumnnameImageFileName TEXT NOT NULL,
+            $imagesColumnnameImageNickName TEXT,
             $imagesColumnnameImageTagID TEXT,
             PRIMARY KEY("$imagesColumnnameImageID" AUTOINCREMENT)
           )

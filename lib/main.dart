@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:camera_app/screens/camera_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'db_manager.dart';
 
@@ -66,13 +67,26 @@ class _GalleryPageState extends State<GalleryPage> {
     debugPrint(
       '_imagesTableData: ' + _imagesTableData.toString(),
     );
+
+    final appDir = await getApplicationDocumentsDirectory();
+    debugPrint('appDir.path: ' + appDir.path);
     List<String> _imagesPathList = [];
+
     for (var imageData in _imagesTableData) {
-      _imagesPathList.add(imageData[_dbManager.imagesColumnnameImagePath]);
+      String _imageFileName =
+          imageData[_dbManager.imagesColumnnameImageFileName];
+      String _imagePath = '';
+      if (Platform.isAndroid) {
+        _imagePath = ('${appDir.path}/../cache/$_imageFileName');
+      } else if (Platform.isIOS) {
+        _imagePath = ('${appDir.path}/camera/pictures/$_imageFileName');
+      }
+      _imagesPathList.add(_imagePath);
     }
     debugPrint(
       '_imagesPathList: ' + _imagesPathList.toString(),
     );
+
     return _imagesPathList;
   }
 

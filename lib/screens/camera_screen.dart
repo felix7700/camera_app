@@ -67,22 +67,12 @@ class _CameraScreenState extends State<CameraScreen> {
                     final XFile _image = await controller.takePicture();
                     debugPrint('_image.path: ' + _image.path);
 
-                    final appDir = await getApplicationDocumentsDirectory();
-                    debugPrint('appDir.path: ' + appDir.path);
                     final fileName = basename(_image.path);
                     debugPrint('fileName: ' + fileName);
 
-                    String imagePath = '';
-                    if (Platform.isAndroid) {
-                      imagePath = ('${appDir.path}/../cache/$fileName');
-                    } else if (Platform.isIOS) {
-                      imagePath = ('${appDir.path}/camera/pictures/$fileName');
-                    }
-                    debugPrint('imagePath: ' + imagePath);
-
                     Map<String, dynamic> _newImageDataRow = {
-                      _dbManager.imagesColumnnameImagePath: imagePath,
-                      _dbManager.imagesColumnnameImageName: null,
+                      _dbManager.imagesColumnnameImageFileName: fileName,
+                      _dbManager.imagesColumnnameImageNickName: null,
                       _dbManager.imagesColumnnameImageTagID: null,
                     };
                     int _resultImageId = await _dbManager.insertIntoTable(
