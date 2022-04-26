@@ -55,15 +55,18 @@ class _GalleryPageState extends State<GalleryPage> {
           _widget = Scaffold(
             appBar: AppBar(
               title: const Text('Bilder Gallerie'),
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
             ),
             body: Padding(
               padding: const EdgeInsets.only(top: 2.0),
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 100,
-                    childAspectRatio: 1 / 1,
-                    crossAxisSpacing: 2,
-                    mainAxisSpacing: 2),
+                  maxCrossAxisExtent: 100,
+                  childAspectRatio: 1 / 1,
+                  crossAxisSpacing: 2,
+                  mainAxisSpacing: 2,
+                ),
                 itemCount: _imagesPathList.length,
                 itemBuilder: (BuildContext ctx, index) {
                   return Expanded(

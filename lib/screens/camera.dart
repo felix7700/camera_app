@@ -15,11 +15,13 @@ class CameraScreen extends StatefulWidget {
 class _CameraScreenState extends State<CameraScreen> {
   late CameraController controller;
   final DbManager _dbManager = DbManager.instance;
+  final selectedCamera = 0;
 
   @override
   void initState() {
     super.initState();
-    controller = CameraController(cameras[0], ResolutionPreset.max);
+    controller =
+        CameraController(cameras[selectedCamera], ResolutionPreset.max);
     controller.initialize().then(
       (_) {
         if (!mounted) {
@@ -34,6 +36,38 @@ class _CameraScreenState extends State<CameraScreen> {
   void dispose() {
     controller.dispose();
     super.dispose();
+  }
+
+  void _saveImage(BuildContext context) async {
+    final XFile _image = await controller.takePicture();
+    debugPrint('_image.path: ' + _image.path);
+
+    final fileName = basename(_image.path);
+    debugPrint('fileName: ' + fileName);
+
+    Map<String, dynamic> _newImageDataRow = {
+      _dbManager.imagesColumnnameImageFileName: fileName,
+      _dbManager.imagesColumnnameImageNickName: null,
+      _dbManager.imagesColumnnameImageTagID: null,
+    };
+    int _resultImageId = await _dbManager.insertIntoTable(
+        tableName: _dbManager.imagesTablename, row: _newImageDataRow);
+    debugPrint('_resultImageId : ' + _resultImageId.toString());
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Bild wurde hinzugefügt'),
+      ),
+    );
+
+    debugPrint('DisplayPictureScreen with path: ' + _image.path);
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => DisplayPictureScreen(
+          imagePath: _image.path,
+        ),
+      ),
+    );
   }
 
   @override
@@ -64,37 +98,7 @@ class _CameraScreenState extends State<CameraScreen> {
                 FloatingActionButton(
                   backgroundColor: Colors.grey,
                   onPressed: () async {
-                    final XFile _image = await controller.takePicture();
-                    debugPrint('_image.path: ' + _image.path);
-
-                    final fileName = basename(_image.path);
-                    debugPrint('fileName: ' + fileName);
-
-                    Map<String, dynamic> _newImageDataRow = {
-                      _dbManager.imagesColumnnameImageFileName: fileName,
-                      _dbManager.imagesColumnnameImageNickName: null,
-                      _dbManager.imagesColumnnameImageTagID: null,
-                    };
-                    int _resultImageId = await _dbManager.insertIntoTable(
-                        tableName: _dbManager.imagesTablename,
-                        row: _newImageDataRow);
-                    debugPrint('_resultImageId : ' + _resultImageId.toString());
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Bild wurde hinzugefügt'),
-                      ),
-                    );
-
-                    debugPrint(
-                        'DisplayPictureScreen with path: ' + _image.path);
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => DisplayPictureScreen(
-                          imagePath: _image.path,
-                        ),
-                      ),
-                    );
+                    _saveImage(context);
                   },
                   child: const Icon(Icons.camera_alt),
                 ),
