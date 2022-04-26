@@ -1,11 +1,11 @@
-import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:camera_app/db_manager.dart';
 import 'package:camera_app/main.dart';
+import 'package:camera_app/screens/captured_picture.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
+
+import 'gallery.dart';
 
 class CameraScreen extends StatefulWidget {
   @override
