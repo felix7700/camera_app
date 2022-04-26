@@ -15,7 +15,7 @@ class CameraScreen extends StatefulWidget {
 class _CameraScreenState extends State<CameraScreen> {
   late CameraController controller;
   final DbManager _dbManager = DbManager.instance;
-  final selectedCamera = 0;
+  int selectedCamera = 0;
 
   @override
   void initState() {
@@ -70,6 +70,25 @@ class _CameraScreenState extends State<CameraScreen> {
     );
   }
 
+  Future<void> _switchCamera() async {
+    if (selectedCamera == 0) {
+      selectedCamera = 1;
+    } else {
+      selectedCamera = 0;
+    }
+    controller =
+        CameraController(cameras[selectedCamera], ResolutionPreset.max);
+    debugPrint('selectedCamera = ' + selectedCamera.toString());
+    controller.initialize().then(
+      (_) {
+        if (!mounted) {
+          return;
+        }
+        setState(() {});
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!controller.value.isInitialized) {
@@ -92,17 +111,24 @@ class _CameraScreenState extends State<CameraScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const SizedBox(
-                  width: 64,
+                FloatingActionButton(
+                  child: const Icon(
+                    Icons.flip_camera_ios,
+                  ),
+                  backgroundColor: Colors.grey,
+                  onPressed: () {
+                    _switchCamera();
+                  },
                 ),
                 FloatingActionButton(
+                  child: const Icon(Icons.camera_alt),
                   backgroundColor: Colors.grey,
                   onPressed: () async {
                     _saveImage(context);
                   },
-                  child: const Icon(Icons.camera_alt),
                 ),
                 FloatingActionButton(
+                  child: const Icon(Icons.image),
                   backgroundColor: Colors.grey,
                   onPressed: () async {
                     debugPrint('show GalleryPage()');
@@ -112,7 +138,6 @@ class _CameraScreenState extends State<CameraScreen> {
                       ),
                     );
                   },
-                  child: const Icon(Icons.image),
                 ),
               ],
             ),
