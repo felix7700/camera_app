@@ -18,9 +18,7 @@ class _GalleryPageState extends State<GalleryPage> {
   Future<List<String>> _getImagesPaths() async {
     List<Map<String, dynamic>> _imagesTableData =
         await _dbManager.queryAllRows(tableName: _dbManager.imagesTablename);
-    debugPrint(
-      '_imagesTableData: ' + _imagesTableData.toString(),
-    );
+    // debugPrint('_imagesTableData: ' + _imagesTableData.toString());
 
     final appDir = await getApplicationDocumentsDirectory();
     debugPrint('appDir.path: ' + appDir.path);
@@ -37,10 +35,7 @@ class _GalleryPageState extends State<GalleryPage> {
       }
       _imagesPathList.add(_imagePath);
     }
-    debugPrint(
-      '_imagesPathList: ' + _imagesPathList.toString(),
-    );
-
+    // debugPrint('_imagesPathList: ' + _imagesPathList.toString());
     return _imagesPathList;
   }
 
@@ -57,6 +52,15 @@ class _GalleryPageState extends State<GalleryPage> {
               title: const Text('Bilder Gallerie'),
               backgroundColor: Colors.white,
               foregroundColor: Colors.black,
+              actions: [
+                FloatingActionButton(
+                  heroTag: 'showFilter',
+                  child: const Icon(Icons.filter),
+                  onPressed: () {
+                    debugPrint('show filter');
+                  },
+                ),
+              ],
             ),
             body: Padding(
               padding: const EdgeInsets.only(top: 2.0),
@@ -69,13 +73,11 @@ class _GalleryPageState extends State<GalleryPage> {
                 ),
                 itemCount: _imagesPathList.length,
                 itemBuilder: (BuildContext ctx, index) {
-                  return Expanded(
-                    child: FittedBox(
-                      fit: BoxFit.fill,
-                      alignment: Alignment.center,
-                      child: Image.file(
-                        File(_imagesPathList[index]),
-                      ),
+                  return FittedBox(
+                    fit: BoxFit.fill,
+                    alignment: Alignment.center,
+                    child: Image.file(
+                      File(_imagesPathList[index]),
                     ),
                   );
                 },

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:camera_app/db_manager.dart';
 import 'package:camera_app/main.dart';
@@ -20,8 +22,11 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void initState() {
     super.initState();
-    controller =
-        CameraController(cameras[selectedCamera], ResolutionPreset.max);
+    controller = CameraController(
+      cameras[selectedCamera],
+      ResolutionPreset.medium,
+      imageFormatGroup: ImageFormatGroup.yuv420,
+    );
     controller.initialize().then(
       (_) {
         if (!mounted) {
@@ -38,7 +43,7 @@ class _CameraScreenState extends State<CameraScreen> {
     super.dispose();
   }
 
-  void _saveImage(BuildContext context) async {
+  void _saveImage(BuildContext buildcontext) async {
     final XFile _image = await controller.takePicture();
     debugPrint('_image.path: ' + _image.path);
 
@@ -54,14 +59,14 @@ class _CameraScreenState extends State<CameraScreen> {
         tableName: _dbManager.imagesTablename, row: _newImageDataRow);
     debugPrint('_resultImageId : ' + _resultImageId.toString());
 
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(buildcontext).showSnackBar(
       const SnackBar(
         content: Text('Bild wurde hinzugefügt'),
       ),
     );
 
     debugPrint('DisplayPictureScreen with path: ' + _image.path);
-    await Navigator.of(context).push(
+    await Navigator.of(buildcontext).push(
       MaterialPageRoute(
         builder: (context) => DisplayPictureScreen(
           imagePath: _image.path,
@@ -76,8 +81,11 @@ class _CameraScreenState extends State<CameraScreen> {
     } else {
       selectedCamera = 0;
     }
-    controller =
-        CameraController(cameras[selectedCamera], ResolutionPreset.max);
+    controller = CameraController(
+      cameras[selectedCamera],
+      ResolutionPreset.medium,
+      imageFormatGroup: ImageFormatGroup.yuv420,
+    );
     debugPrint('selectedCamera = ' + selectedCamera.toString());
     controller.initialize().then(
       (_) {
@@ -112,6 +120,7 @@ class _CameraScreenState extends State<CameraScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 FloatingActionButton(
+                  heroTag: 'switchCamera',
                   child: const Icon(
                     Icons.flip_camera_ios,
                   ),
@@ -121,6 +130,7 @@ class _CameraScreenState extends State<CameraScreen> {
                   },
                 ),
                 FloatingActionButton(
+                  heroTag: 'saveImage',
                   child: const Icon(Icons.camera_alt),
                   backgroundColor: Colors.grey,
                   onPressed: () async {
@@ -128,6 +138,7 @@ class _CameraScreenState extends State<CameraScreen> {
                   },
                 ),
                 FloatingActionButton(
+                  heroTag: 'showGalleryPage',
                   child: const Icon(Icons.image),
                   backgroundColor: Colors.grey,
                   onPressed: () async {
