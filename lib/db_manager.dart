@@ -96,7 +96,7 @@ class DbManager {
     db.execute('DROP TABLE IF EXISTS $tableName');
   }
 
-  Future<List<Map<String, dynamic>>> queryAllRows(
+  Future<List<Map<String, dynamic>>> queryAllRowsFromAtable(
       {required String tableName}) async {
     debugPrint('queryAllRows');
     Database db = await instance.database;

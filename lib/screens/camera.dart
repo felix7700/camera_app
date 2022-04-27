@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:camera_app/db_manager.dart';
 import 'package:camera_app/main.dart';
@@ -8,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 
 import 'gallery.dart';
+
+const cameraResolutionPreset = ResolutionPreset.high;
 
 class CameraScreen extends StatefulWidget {
   @override
@@ -24,7 +24,7 @@ class _CameraScreenState extends State<CameraScreen> {
     super.initState();
     controller = CameraController(
       cameras[selectedCamera],
-      ResolutionPreset.medium,
+      cameraResolutionPreset,
       imageFormatGroup: ImageFormatGroup.yuv420,
     );
     controller.initialize().then(
@@ -45,10 +45,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
   void _saveImage(BuildContext buildcontext) async {
     final XFile _image = await controller.takePicture();
-    debugPrint('_image.path: ' + _image.path);
-
     final fileName = basename(_image.path);
-    debugPrint('fileName: ' + fileName);
 
     Map<String, dynamic> _newImageDataRow = {
       _dbManager.imagesColumnnameImageFileName: fileName,
@@ -57,7 +54,6 @@ class _CameraScreenState extends State<CameraScreen> {
     };
     int _resultImageId = await _dbManager.insertIntoTable(
         tableName: _dbManager.imagesTablename, row: _newImageDataRow);
-    debugPrint('_resultImageId : ' + _resultImageId.toString());
 
     ScaffoldMessenger.of(buildcontext).showSnackBar(
       const SnackBar(
@@ -65,7 +61,6 @@ class _CameraScreenState extends State<CameraScreen> {
       ),
     );
 
-    debugPrint('DisplayPictureScreen with path: ' + _image.path);
     await Navigator.of(buildcontext).push(
       MaterialPageRoute(
         builder: (context) => DisplayPictureScreen(
@@ -83,10 +78,9 @@ class _CameraScreenState extends State<CameraScreen> {
     }
     controller = CameraController(
       cameras[selectedCamera],
-      ResolutionPreset.medium,
+      cameraResolutionPreset,
       imageFormatGroup: ImageFormatGroup.yuv420,
     );
-    debugPrint('selectedCamera = ' + selectedCamera.toString());
     controller.initialize().then(
       (_) {
         if (!mounted) {

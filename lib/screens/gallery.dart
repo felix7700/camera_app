@@ -5,6 +5,10 @@ import 'package:path_provider/path_provider.dart';
 
 import '../db_manager.dart';
 
+const Color galleryBackgroundColor = Colors.white;
+const Color galleryForeroundColor = Colors.black;
+const double galleryGridAxisSpacing = 1.0;
+
 class GalleryPage extends StatefulWidget {
   const GalleryPage({Key? key}) : super(key: key);
 
@@ -15,13 +19,11 @@ class GalleryPage extends StatefulWidget {
 class _GalleryPageState extends State<GalleryPage> {
   final DbManager _dbManager = DbManager.instance;
 
-  Future<List<String>> _getImagesPaths() async {
-    List<Map<String, dynamic>> _imagesTableData =
-        await _dbManager.queryAllRows(tableName: _dbManager.imagesTablename);
-    // debugPrint('_imagesTableData: ' + _imagesTableData.toString());
+  Future<List<String>> _getAllImagesPaths() async {
+    List<Map<String, dynamic>> _imagesTableData = await _dbManager
+        .queryAllRowsFromAtable(tableName: _dbManager.imagesTablename);
 
     final appDir = await getApplicationDocumentsDirectory();
-    debugPrint('appDir.path: ' + appDir.path);
     List<String> _imagesPathList = [];
 
     for (var imageData in _imagesTableData) {
@@ -35,14 +37,13 @@ class _GalleryPageState extends State<GalleryPage> {
       }
       _imagesPathList.add(_imagePath);
     }
-    // debugPrint('_imagesPathList: ' + _imagesPathList.toString());
     return _imagesPathList;
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _getImagesPaths(),
+      future: _getAllImagesPaths(),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         Widget _widget;
         if (snapshot.hasData) {
@@ -50,15 +51,24 @@ class _GalleryPageState extends State<GalleryPage> {
           _widget = Scaffold(
             appBar: AppBar(
               title: const Text('Bilder Gallerie'),
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
+              backgroundColor: galleryBackgroundColor,
+              foregroundColor: galleryForeroundColor,
               actions: [
-                FloatingActionButton(
-                  heroTag: 'showFilter',
-                  child: const Icon(Icons.filter),
-                  onPressed: () {
-                    debugPrint('show filter');
-                  },
+                SizedBox(
+                  height: 32,
+                  width: 32,
+                  child: FloatingActionButton(
+                    heroTag: 'showFilter',
+                    backgroundColor: const Color.fromARGB(0, 0, 0, 0),
+                    elevation: 0,
+                    foregroundColor: galleryForeroundColor,
+                    child: const Icon(
+                      Icons.filter,
+                    ),
+                    onPressed: () {
+                      debugPrint('show filter');
+                    },
+                  ),
                 ),
               ],
             ),
@@ -68,8 +78,8 @@ class _GalleryPageState extends State<GalleryPage> {
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                   maxCrossAxisExtent: 100,
                   childAspectRatio: 1 / 1,
-                  crossAxisSpacing: 2,
-                  mainAxisSpacing: 2,
+                  crossAxisSpacing: galleryGridAxisSpacing,
+                  mainAxisSpacing: galleryGridAxisSpacing,
                 ),
                 itemCount: _imagesPathList.length,
                 itemBuilder: (BuildContext ctx, index) {
@@ -85,12 +95,10 @@ class _GalleryPageState extends State<GalleryPage> {
             ),
           );
         } else if (snapshot.hasError) {
-          _widget = MaterialApp(
-            home: Scaffold(
-              body: Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Text('Error: ${snapshot.error}'),
-              ),
+          _widget = Scaffold(
+            body: Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: Text('Error: ${snapshot.error}'),
             ),
           );
         } else {

@@ -12,8 +12,15 @@ class DisplayPictureScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Display the Picture')),
-      body: Image.file(
-        File(imagePath),
+      body: SizedBox(
+        height: double.infinity,
+        width: double.infinity,
+        child: FittedBox(
+          fit: BoxFit.fitHeight,
+          child: Image.file(
+            File(imagePath),
+          ),
+        ),
       ),
     );
   }

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:camera_app/screens/camera.dart';
 import 'package:flutter/material.dart';
