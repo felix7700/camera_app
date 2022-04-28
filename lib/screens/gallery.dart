@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:camera_app/constants.dart';
 import 'package:camera_app/widgets/image_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -38,7 +39,7 @@ class _GalleryPageState extends State<GalleryPage> {
       }
       int _imageId = imageData[_dbManager.imagesColumnnameImageID];
       int? _imageTagId = imageData[_dbManager.imagesColumnnameImageTagID];
-      _result.add([_imageId, _imageTagId, _imagePath]);
+      _result.add([imageData, _imagePath]);
     }
 
     return _result;
@@ -57,7 +58,7 @@ class _GalleryPageState extends State<GalleryPage> {
     ];
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // user must tap button!
+      // barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('AlertDialog Title'),
@@ -98,8 +99,8 @@ class _GalleryPageState extends State<GalleryPage> {
           _widget = Scaffold(
             appBar: AppBar(
               title: const Text('Bilder Gallerie'),
-              backgroundColor: galleryBackgroundColor,
-              foregroundColor: galleryForeroundColor,
+              backgroundColor: AppColors.appBarBgColor,
+              foregroundColor: AppColors.appBarFgColor,
               actions: [
                 SizedBox(
                   height: 32,
@@ -129,12 +130,11 @@ class _GalleryPageState extends State<GalleryPage> {
                   crossAxisSpacing: galleryGridAxisSpacing,
                   mainAxisSpacing: galleryGridAxisSpacing,
                 ),
-                itemCount: snapshot.data[2].length,
+                itemCount: snapshot.data.length,
                 itemBuilder: (BuildContext ctx, index) {
                   return ImageWidget(
-                    imageId: snapshot.data[index][0],
-                    tagId: snapshot.data[index][1],
-                    imagePath: snapshot.data[index][2],
+                    imageData: snapshot.data[index][0],
+                    imagePath: snapshot.data[index][1],
                   );
                 },
               ),

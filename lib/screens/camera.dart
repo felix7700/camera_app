@@ -63,7 +63,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
     await Navigator.of(buildcontext).push(
       MaterialPageRoute(
-        builder: (context) => DisplayPictureScreen(
+        builder: (context) => CapturedPictureScreen(
           imagePath: _image.path,
         ),
       ),
@@ -95,12 +95,18 @@ class _CameraScreenState extends State<CameraScreen> {
   Widget build(BuildContext context) {
     if (!controller.value.isInitialized) {
       return const Scaffold(
+        backgroundColor: Colors.black,
         body: Center(
-          child: Text('!controller.value.isInitialized'),
+          child: SizedBox(
+            width: 60,
+            height: 60,
+            child: CircularProgressIndicator(),
+          ),
         ),
       );
     }
     return Scaffold(
+      extendBody: true,
       backgroundColor: Colors.black,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,
