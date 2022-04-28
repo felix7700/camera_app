@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:camera_app/widgets/image_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -19,12 +20,12 @@ class GalleryPage extends StatefulWidget {
 class _GalleryPageState extends State<GalleryPage> {
   final DbManager _dbManager = DbManager.instance;
 
-  Future<List<String>> _getAllImagesPaths() async {
+  Future<List<dynamic>> _getAllRelatedImagesData() async {
     List<Map<String, dynamic>> _imagesTableData = await _dbManager
         .queryAllRowsFromAtable(tableName: _dbManager.imagesTablename);
 
     final appDir = await getApplicationDocumentsDirectory();
-    List<String> _imagesPathList = [];
+    List<dynamic> _result = [];
 
     for (var imageData in _imagesTableData) {
       String _imageFileName =
@@ -35,19 +36,65 @@ class _GalleryPageState extends State<GalleryPage> {
       } else if (Platform.isIOS) {
         _imagePath = ('${appDir.path}/camera/pictures/$_imageFileName');
       }
-      _imagesPathList.add(_imagePath);
+      int _imageId = imageData[_dbManager.imagesColumnnameImageID];
+      int? _imageTagId = imageData[_dbManager.imagesColumnnameImageTagID];
+      _result.add([_imageId, _imageTagId, _imagePath]);
     }
-    return _imagesPathList;
+
+    return _result;
+  }
+
+  Future<void> _showMyDialog() async {
+    List<DropdownMenuItem<dynamic>> tagsListAsDropdownMenuItems = [
+      const DropdownMenuItem(
+        child: Text('tag'),
+        value: 1,
+      ),
+      const DropdownMenuItem(
+        child: Text('tag'),
+        value: 2,
+      ),
+    ];
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('AlertDialog Title'),
+          content: SingleChildScrollView(
+            child: DropdownButton<dynamic>(
+              value: 1,
+              items: tagsListAsDropdownMenuItems,
+              onChanged: (selectedTag) {},
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Abbrechen'),
+              onPressed: () {
+                debugPrint('Tagauswahl abgebrochen');
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _getAllImagesPaths(),
+      future: _getAllRelatedImagesData(),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         Widget _widget;
         if (snapshot.hasData) {
-          final List<String> _imagesPathList = snapshot.data;
           _widget = Scaffold(
             appBar: AppBar(
               title: const Text('Bilder Gallerie'),
@@ -67,6 +114,7 @@ class _GalleryPageState extends State<GalleryPage> {
                     ),
                     onPressed: () {
                       debugPrint('show filter');
+                      _showMyDialog();
                     },
                   ),
                 ),
@@ -81,14 +129,12 @@ class _GalleryPageState extends State<GalleryPage> {
                   crossAxisSpacing: galleryGridAxisSpacing,
                   mainAxisSpacing: galleryGridAxisSpacing,
                 ),
-                itemCount: _imagesPathList.length,
+                itemCount: snapshot.data[2].length,
                 itemBuilder: (BuildContext ctx, index) {
-                  return FittedBox(
-                    fit: BoxFit.fill,
-                    alignment: Alignment.center,
-                    child: Image.file(
-                      File(_imagesPathList[index]),
-                    ),
+                  return ImageWidget(
+                    imageId: snapshot.data[index][0],
+                    tagId: snapshot.data[index][1],
+                    imagePath: snapshot.data[index][2],
                   );
                 },
               ),
