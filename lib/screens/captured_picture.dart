@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:camera_app/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class CapturedPictureScreen extends StatelessWidget {
   final String imagePath;

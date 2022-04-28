@@ -6,9 +6,14 @@ import 'package:flutter/material.dart';
 import '../db_manager.dart';
 
 class ImageWidget extends StatefulWidget {
-  ImageWidget({Key? key, required this.imageData, required this.imagePath})
+  ImageWidget(
+      {Key? key,
+      required this.imageData,
+      required this.imagePath,
+      required this.reloadImagesFunction})
       : super(key: key);
 
+  Function reloadImagesFunction;
   Map<String, dynamic> imageData;
   String imagePath;
 
@@ -18,6 +23,7 @@ class ImageWidget extends StatefulWidget {
 
 class _ImageWidgetState extends State<ImageWidget> {
   final DbManager _dbManager = DbManager.instance;
+  Widget? imageFileWidget;
 
   Future<void> _showMyDialog() async {
     List<DropdownMenuItem<dynamic>> tagsListAsDropdownMenuItems = [
@@ -30,12 +36,16 @@ class _ImageWidgetState extends State<ImageWidget> {
         value: 2,
       ),
     ];
+
     return showDialog<void>(
       context: context,
       // barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('AlertDialog Title'),
+          title: const Text(
+            'Tag ändern / Bild löschen',
+            style: TextStyle(fontSize: 16),
+          ),
           content: SingleChildScrollView(
             child: DropdownButton<dynamic>(
               value: 1,
@@ -44,23 +54,40 @@ class _ImageWidgetState extends State<ImageWidget> {
             ),
           ),
           actions: <Widget>[
-            TextButton(
-              child: const Text('Abbrechen'),
-              onPressed: () {
-                debugPrint('Tagauswahl abgebrochen');
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Ok'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+            const Text('Bild Löschen'),
+            IconButton(
+              onPressed: (() async {
+                debugPrint('delete image');
+                var error = await _deleteImage();
+                debugPrint('Delete Image Result: ' + error.toString());
+                widget.reloadImagesFunction();
+              }),
+              icon: const Icon(Icons.delete),
             ),
           ],
         );
       },
     );
+  }
+
+  Future<dynamic> _deleteImage() async {
+    try {
+      await File(widget.imagePath).delete(recursive: true);
+    } catch (e) {
+      return 'error delete file: ' + e.toString();
+    }
+    try {
+      await _dbManager.deleteRow(
+        tableName: _dbManager.imagesTablename,
+        idColumnname: _dbManager.imagesColumnnameImageID,
+        id: widget.imageData[_dbManager.imagesColumnnameImageID],
+      );
+    } catch (e) {
+      return 'error deleteRow: ' + e.toString();
+    }
+    Navigator.of(context).pop();
+
+    return 'no Error';
   }
 
   @override
