@@ -2,10 +2,10 @@ import 'package:camera/camera.dart';
 import 'package:camera_app/db_manager.dart';
 import 'package:camera_app/main.dart';
 import 'package:camera_app/screens/captured_picture.dart';
-import 'package:camera_app/widgets/custom_circular_progress_indicator.dart';
-import 'package:camera_app/widgets/save_image_button.dart';
-import 'package:camera_app/widgets/show_gallery_button.dart';
-import 'package:camera_app/widgets/switch_camera_button.dart';
+import 'package:camera_app/widgets/circular_progress_indicator_custom.dart';
+import 'package:camera_app/widgets/button_save_image.dart';
+import 'package:camera_app/widgets/button_show_gallery.dart';
+import 'package:camera_app/widgets/button_switch_camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 
@@ -13,14 +13,14 @@ import 'gallery.dart';
 
 const cameraResolutionPreset = ResolutionPreset.high;
 
-class CameraScreen extends StatefulWidget {
-  const CameraScreen({Key? key}) : super(key: key);
+class ScreenCamera extends StatefulWidget {
+  const ScreenCamera({Key? key}) : super(key: key);
 
   @override
-  _CameraScreenState createState() => _CameraScreenState();
+  _ScreenCameraState createState() => _ScreenCameraState();
 }
 
-class _CameraScreenState extends State<CameraScreen> {
+class _ScreenCameraState extends State<ScreenCamera> {
   late CameraController controller;
   final DbManager _dbManager = DbManager.instance;
   int selectedCamera = 0;
@@ -115,9 +115,9 @@ class _CameraScreenState extends State<CameraScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      SwitchCameraButton(onPressed: _switchCamera),
-                      SaveImageButton(saveImageFunction: _saveImage),
-                      ShowGalleryButton(
+                      ButtonSwitchCamera(onPressed: _switchCamera),
+                      ButtonSaveImage(saveImageFunction: _saveImage),
+                      ButtonShowGallery(
                           galleryScreenWidget: const GalleryPage()),
                     ],
                   ),
@@ -125,7 +125,7 @@ class _CameraScreenState extends State<CameraScreen> {
               ],
             )
           : const Center(
-              child: CustomCircularProgressIndicator(),
+              child: CircularProgressIndicatorCustom(),
             ),
     );
   }

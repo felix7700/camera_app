@@ -8,7 +8,7 @@ List<String> imagesPaths = [];
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Widget app = const CameraScreen();
+  Widget app = const ScreenCamera();
   try {
     cameras = await availableCameras();
   } on CameraException catch (error) {

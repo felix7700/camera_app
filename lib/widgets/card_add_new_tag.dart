@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../db_manager.dart';
 
-class AddNewTagCard extends StatelessWidget {
-  AddNewTagCard({Key? key, required this.addNewTagFunction}) : super(key: key);
+class CardAddNewTag extends StatelessWidget {
+  CardAddNewTag({Key? key, required this.addNewTagFunction}) : super(key: key);
   final Function addNewTagFunction;
   final categoryNameTextEditingController = TextEditingController();
   final _formKeyCategoryNameInput = GlobalKey<FormState>();

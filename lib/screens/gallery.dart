@@ -2,7 +2,7 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:camera_app/constants.dart';
-import 'package:camera_app/widgets/add_new_tag_card.dart';
+import 'package:camera_app/widgets/card_add_new_tag.dart';
 import 'package:camera_app/widgets/image_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -56,9 +56,30 @@ class _GalleryPageState extends State<GalleryPage> {
         value: 2,
       ),
     ];
+    tagsListAsDropdownMenuItems = [];
     var tagsData = await _dbManager.queryAllRowsFromAtable(
         tableName: _dbManager.tagsTablename);
     debugPrint('tagsData: ' + tagsData.toString());
+    for (var tagData in tagsData) {
+      tagsListAsDropdownMenuItems.add(
+        DropdownMenuItem(
+          child: Card(
+            elevation: 2.0,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SizedBox(
+                height: 16.0,
+                width: 128.0,
+                child: Text(
+                  tagData[_dbManager.tagsColumnnameTagName],
+                ),
+              ),
+            ),
+          ),
+          value: tagData[_dbManager.tagsColumnnameTagID],
+        ),
+      );
+    }
     return showDialog<void>(
       context: context,
       // barrierDismissible: false,
@@ -67,7 +88,7 @@ class _GalleryPageState extends State<GalleryPage> {
           title: const Text('Nach Tag filtern'),
           content: SingleChildScrollView(
             child: DropdownButton<dynamic>(
-              value: 2,
+              value: 1,
               items: tagsListAsDropdownMenuItems,
               onChanged: (selectedTag) {},
             ),
@@ -96,7 +117,7 @@ class _GalleryPageState extends State<GalleryPage> {
     await Navigator.of(buildContext).push(
       MaterialPageRoute(
         builder: (buildContext) =>
-            AddNewTagCard(addNewTagFunction: insertAnewTagIntoTagtable),
+            CardAddNewTag(addNewTagFunction: insertAnewTagIntoTagtable),
       ),
     );
   }

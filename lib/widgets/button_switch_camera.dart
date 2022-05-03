@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class SwitchCameraButton extends StatelessWidget {
-  const SwitchCameraButton({Key? key, required this.onPressed})
+class ButtonSwitchCamera extends StatelessWidget {
+  const ButtonSwitchCamera({Key? key, required this.onPressed})
       : super(key: key);
   final Function onPressed;
 
