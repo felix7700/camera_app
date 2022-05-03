@@ -1,6 +1,8 @@
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:camera_app/constants.dart';
+import 'package:camera_app/widgets/add_new_tag_card.dart';
 import 'package:camera_app/widgets/image_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -43,7 +45,7 @@ class _GalleryPageState extends State<GalleryPage> {
     return _result;
   }
 
-  Future<void> _showMyDialog() async {
+  Future<void> _showTagFilterDialog() async {
     List<DropdownMenuItem<dynamic>> tagsListAsDropdownMenuItems = [
       const DropdownMenuItem(
         child: Text('Auto'),
@@ -54,6 +56,9 @@ class _GalleryPageState extends State<GalleryPage> {
         value: 2,
       ),
     ];
+    var tagsData = await _dbManager.queryAllRowsFromAtable(
+        tableName: _dbManager.tagsTablename);
+    debugPrint('tagsData: ' + tagsData.toString());
     return showDialog<void>(
       context: context,
       // barrierDismissible: false,
@@ -62,7 +67,7 @@ class _GalleryPageState extends State<GalleryPage> {
           title: const Text('Nach Tag filtern'),
           content: SingleChildScrollView(
             child: DropdownButton<dynamic>(
-              value: 1,
+              value: 2,
               items: tagsListAsDropdownMenuItems,
               onChanged: (selectedTag) {},
             ),
@@ -87,8 +92,21 @@ class _GalleryPageState extends State<GalleryPage> {
     );
   }
 
-  Future<void> addNewTag() async {
-    debugPrint('add new tag xxx to image');
+  Future<void> showAddNewTagCard({required BuildContext buildContext}) async {
+    await Navigator.of(buildContext).push(
+      MaterialPageRoute(
+        builder: (buildContext) =>
+            AddNewTagCard(addNewTagFunction: insertAnewTagIntoTagtable),
+      ),
+    );
+  }
+
+  insertAnewTagIntoTagtable({required Map<String, dynamic> newTagRow}) async {
+    debugPrint('insertAnewTagIntoTagtable()');
+    debugPrint('newCategoryRow: ' + newTagRow.toString());
+    var _result = await _dbManager.insertIntoTable(
+        tableName: _dbManager.tagsTablename, row: newTagRow);
+    debugPrint('_result: ' + _result.toString());
   }
 
   @override
@@ -106,7 +124,7 @@ class _GalleryPageState extends State<GalleryPage> {
               actions: [
                 IconButton(
                   onPressed: () {
-                    addNewTag();
+                    showAddNewTagCard(buildContext: context);
                   },
                   icon: const Icon(
                     Icons.add,
@@ -119,7 +137,7 @@ class _GalleryPageState extends State<GalleryPage> {
                 IconButton(
                   onPressed: () {
                     debugPrint('show filter');
-                    _showMyDialog();
+                    _showTagFilterDialog();
                   },
                   icon: const Icon(
                     Icons.label_outline_rounded,
