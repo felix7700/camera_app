@@ -2,6 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:camera_app/db_manager.dart';
 import 'package:camera_app/main.dart';
 import 'package:camera_app/screens/captured_picture.dart';
+import 'package:camera_app/widgets/switch_camera_button.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 
@@ -10,6 +11,8 @@ import 'gallery.dart';
 const cameraResolutionPreset = ResolutionPreset.high;
 
 class CameraScreen extends StatefulWidget {
+  const CameraScreen({Key? key}) : super(key: key);
+
   @override
   _CameraScreenState createState() => _CameraScreenState();
 }
@@ -93,68 +96,54 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (!controller.value.isInitialized) {
-      return const Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: SizedBox(
-            width: 60,
-            height: 60,
-            child: CircularProgressIndicator(),
-          ),
-        ),
-      );
-    }
     return Scaffold(
-      extendBody: true,
       backgroundColor: Colors.black,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Expanded(
-            child: CameraPreview(controller),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: controller.value.isInitialized
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                FloatingActionButton(
-                  heroTag: 'switchCamera',
-                  child: const Icon(
-                    Icons.flip_camera_ios,
-                  ),
-                  backgroundColor: Colors.grey,
-                  onPressed: () {
-                    _switchCamera();
-                  },
+                Expanded(
+                  child: CameraPreview(controller),
                 ),
-                FloatingActionButton(
-                  heroTag: 'saveImage',
-                  child: const Icon(Icons.camera_alt),
-                  backgroundColor: Colors.grey,
-                  onPressed: () async {
-                    _saveImage(context);
-                  },
-                ),
-                FloatingActionButton(
-                  heroTag: 'showGalleryPage',
-                  child: const Icon(Icons.image),
-                  backgroundColor: Colors.grey,
-                  onPressed: () async {
-                    debugPrint('show GalleryPage()');
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const GalleryPage(),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SwitchCameraButton(onPressed: _switchCamera),
+                      FloatingActionButton(
+                        heroTag: 'saveImage',
+                        child: const Icon(Icons.camera_alt),
+                        backgroundColor: Colors.grey,
+                        onPressed: () async {
+                          _saveImage(context);
+                        },
                       ),
-                    );
-                  },
+                      FloatingActionButton(
+                        heroTag: 'showGalleryPage',
+                        child: const Icon(Icons.image),
+                        backgroundColor: Colors.grey,
+                        onPressed: () async {
+                          debugPrint('show GalleryPage()');
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const GalleryPage(),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ],
+            )
+          : const Center(
+              child: SizedBox(
+                width: 60,
+                height: 60,
+                child: CircularProgressIndicator(),
+              ),
             ),
-          ),
-        ],
-      ),
     );
   }
 }

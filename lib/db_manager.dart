@@ -123,12 +123,12 @@ class DbManager {
 
   Future<List<Map<String, Object?>>> queryItem(
       {required String tableName,
-      required String Columnname,
+      required String columnName,
       required int value}) async {
     debugPrint('queryItem');
     Database db = await instance.database;
     return await db
-        .rawQuery('SELECT * FROM $tableName where $Columnname = $value');
+        .rawQuery('SELECT * FROM $tableName where $columnName = $value');
   }
 
   Future<int> updateRow(

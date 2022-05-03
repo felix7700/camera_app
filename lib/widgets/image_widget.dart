@@ -6,16 +6,16 @@ import 'package:flutter/material.dart';
 import '../db_manager.dart';
 
 class ImageWidget extends StatefulWidget {
-  ImageWidget(
+  const ImageWidget(
       {Key? key,
       required this.imageData,
       required this.imagePath,
       required this.reloadImagesFunction})
       : super(key: key);
 
-  Function reloadImagesFunction;
-  Map<String, dynamic> imageData;
-  String imagePath;
+  final Map<String, dynamic> imageData;
+  final String imagePath;
+  final Function reloadImagesFunction;
 
   @override
   State<ImageWidget> createState() => _ImageWidgetState();
@@ -54,15 +54,22 @@ class _ImageWidgetState extends State<ImageWidget> {
             ),
           ),
           actions: <Widget>[
-            const Text('Bild Löschen'),
-            IconButton(
-              onPressed: (() async {
+            GestureDetector(
+              onTap: () async {
                 debugPrint('delete image');
                 var error = await _deleteImage();
                 debugPrint('Delete Image Result: ' + error.toString());
                 widget.reloadImagesFunction();
-              }),
-              icon: const Icon(Icons.delete),
+                setState(() {});
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: const [
+                  Text('Bild löschen'),
+                  SizedBox(width: 10),
+                  Icon(Icons.delete),
+                ],
+              ),
             ),
           ],
         );

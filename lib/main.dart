@@ -6,27 +6,35 @@ List<CameraDescription> cameras = [];
 List<String> imagesPaths = [];
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   try {
-    WidgetsFlutterBinding.ensureInitialized();
-    cameras = await availableCameras();
-    runApp(
-      MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: CameraScreen(),
-      ),
-    );
+    await initAppWithCamera();
   } on CameraException catch (e) {
-    runApp(
-      MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          body: Center(
-            child: Text(
-              'Error in fetching the cameras: $e',
-            ),
+    initAppWithoutCamera(e);
+  }
+}
+
+void initAppWithoutCamera(CameraException e) {
+  runApp(
+    MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Center(
+          child: Text(
+            'Error in fetching the cameras: $e',
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
+Future<void> initAppWithCamera() async {
+  cameras = await availableCameras();
+  runApp(
+    const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: CameraScreen(),
+    ),
+  );
 }

@@ -37,8 +37,6 @@ class _GalleryPageState extends State<GalleryPage> {
       } else if (Platform.isIOS) {
         _imagePath = ('${appDir.path}/camera/pictures/$_imageFileName');
       }
-      int _imageId = imageData[_dbManager.imagesColumnnameImageID];
-      int? _imageTagId = imageData[_dbManager.imagesColumnnameImageTagID];
       _result.add([imageData, _imagePath]);
     }
 
@@ -48,11 +46,11 @@ class _GalleryPageState extends State<GalleryPage> {
   Future<void> _showMyDialog() async {
     List<DropdownMenuItem<dynamic>> tagsListAsDropdownMenuItems = [
       const DropdownMenuItem(
-        child: Text('tag'),
+        child: Text('Auto'),
         value: 1,
       ),
       const DropdownMenuItem(
-        child: Text('tag'),
+        child: Text('Haus'),
         value: 2,
       ),
     ];
@@ -61,7 +59,7 @@ class _GalleryPageState extends State<GalleryPage> {
       // barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('AlertDialog Title'),
+          title: const Text('Nach Tag filtern'),
           content: SingleChildScrollView(
             child: DropdownButton<dynamic>(
               value: 1,
@@ -106,40 +104,26 @@ class _GalleryPageState extends State<GalleryPage> {
               backgroundColor: AppColors.appBarBgColor,
               foregroundColor: AppColors.appBarFgColor,
               actions: [
-                SizedBox(
-                  height: 32,
-                  width: 32,
-                  child: FloatingActionButton(
-                    heroTag: 'addNewTag',
-                    backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-                    elevation: 0,
-                    foregroundColor: galleryForeroundColor,
-                    child: const Icon(
-                      Icons.add,
-                    ),
-                    onPressed: () {
-                      addNewTag();
-                    },
+                IconButton(
+                  onPressed: () {
+                    addNewTag();
+                  },
+                  icon: const Icon(
+                    Icons.add,
+                    size: 24,
                   ),
                 ),
                 const SizedBox(
-                  width: 32,
+                  width: 5,
                 ),
-                SizedBox(
-                  height: 32,
-                  width: 32,
-                  child: FloatingActionButton(
-                    heroTag: 'showFilter',
-                    backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-                    elevation: 0,
-                    foregroundColor: galleryForeroundColor,
-                    child: const Icon(
-                      Icons.filter,
-                    ),
-                    onPressed: () {
-                      debugPrint('show filter');
-                      _showMyDialog();
-                    },
+                IconButton(
+                  onPressed: () {
+                    debugPrint('show filter');
+                    _showMyDialog();
+                  },
+                  icon: const Icon(
+                    Icons.label_outline_rounded,
+                    size: 24,
                   ),
                 ),
               ],
@@ -158,7 +142,11 @@ class _GalleryPageState extends State<GalleryPage> {
                   return ImageWidget(
                     imageData: snapshot.data[index][0],
                     imagePath: snapshot.data[index][1],
-                    reloadImagesFunction: getAllRelatedImagesData,
+                    reloadImagesFunction: () {
+                      setState(() {
+                        getAllRelatedImagesData();
+                      });
+                    },
                   );
                 },
               ),
