@@ -2,6 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:camera_app/db_manager.dart';
 import 'package:camera_app/main.dart';
 import 'package:camera_app/screens/captured_picture.dart';
+import 'package:camera_app/widgets/save_image_button.dart';
 import 'package:camera_app/widgets/switch_camera_button.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -21,6 +22,7 @@ class _CameraScreenState extends State<CameraScreen> {
   late CameraController controller;
   final DbManager _dbManager = DbManager.instance;
   int selectedCamera = 0;
+  late BuildContext _buildContext;
 
   @override
   void initState() {
@@ -46,7 +48,7 @@ class _CameraScreenState extends State<CameraScreen> {
     super.dispose();
   }
 
-  void _saveImage(BuildContext buildcontext) async {
+  void _saveImage() async {
     final XFile _image = await controller.takePicture();
     final fileName = basename(_image.path);
 
@@ -58,13 +60,13 @@ class _CameraScreenState extends State<CameraScreen> {
     int _resultImageId = await _dbManager.insertIntoTable(
         tableName: _dbManager.imagesTablename, row: _newImageDataRow);
 
-    ScaffoldMessenger.of(buildcontext).showSnackBar(
+    ScaffoldMessenger.of(_buildContext).showSnackBar(
       const SnackBar(
         content: Text('Bild wurde hinzugefügt'),
       ),
     );
 
-    await Navigator.of(buildcontext).push(
+    await Navigator.of(_buildContext).push(
       MaterialPageRoute(
         builder: (context) => CapturedPictureScreen(
           imagePath: _image.path,
@@ -96,6 +98,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _buildContext = context;
     return Scaffold(
       backgroundColor: Colors.black,
       body: controller.value.isInitialized
@@ -111,14 +114,7 @@ class _CameraScreenState extends State<CameraScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       SwitchCameraButton(onPressed: _switchCamera),
-                      FloatingActionButton(
-                        heroTag: 'saveImage',
-                        child: const Icon(Icons.camera_alt),
-                        backgroundColor: Colors.grey,
-                        onPressed: () async {
-                          _saveImage(context);
-                        },
-                      ),
+                      SaveImageButton(saveImageFunction: _saveImage),
                       FloatingActionButton(
                         heroTag: 'showGalleryPage',
                         child: const Icon(Icons.image),
