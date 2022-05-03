@@ -2,6 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:camera_app/db_manager.dart';
 import 'package:camera_app/main.dart';
 import 'package:camera_app/screens/captured_picture.dart';
+import 'package:camera_app/widgets/custom_circular_progress_indicator.dart';
 import 'package:camera_app/widgets/save_image_button.dart';
 import 'package:camera_app/widgets/show_gallery_button.dart';
 import 'package:camera_app/widgets/switch_camera_button.dart';
@@ -62,8 +63,8 @@ class _CameraScreenState extends State<CameraScreen> {
         tableName: _dbManager.imagesTablename, row: _newImageDataRow);
 
     ScaffoldMessenger.of(_buildContext).showSnackBar(
-      const SnackBar(
-        content: Text('Bild wurde hinzugefügt'),
+      SnackBar(
+        content: Text('Bild Nr.$_resultImageId wurde hinzugefügt'),
       ),
     );
 
@@ -124,11 +125,7 @@ class _CameraScreenState extends State<CameraScreen> {
               ],
             )
           : const Center(
-              child: SizedBox(
-                width: 60,
-                height: 60,
-                child: CircularProgressIndicator(),
-              ),
+              child: CustomCircularProgressIndicator(),
             ),
     );
   }
