@@ -3,6 +3,7 @@ import 'package:camera_app/db_manager.dart';
 import 'package:camera_app/main.dart';
 import 'package:camera_app/screens/captured_picture.dart';
 import 'package:camera_app/widgets/save_image_button.dart';
+import 'package:camera_app/widgets/show_gallery_button.dart';
 import 'package:camera_app/widgets/switch_camera_button.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -115,19 +116,8 @@ class _CameraScreenState extends State<CameraScreen> {
                     children: [
                       SwitchCameraButton(onPressed: _switchCamera),
                       SaveImageButton(saveImageFunction: _saveImage),
-                      FloatingActionButton(
-                        heroTag: 'showGalleryPage',
-                        child: const Icon(Icons.image),
-                        backgroundColor: Colors.grey,
-                        onPressed: () async {
-                          debugPrint('show GalleryPage()');
-                          await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const GalleryPage(),
-                            ),
-                          );
-                        },
-                      ),
+                      ShowGalleryButton(
+                          galleryScreenWidget: const GalleryPage()),
                     ],
                   ),
                 ),
