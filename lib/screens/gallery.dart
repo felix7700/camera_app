@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:camera_app/constants.dart';
-import 'package:camera_app/widgets/Alerts/alert_dialog_select_tag_drop_down.dart';
 import 'package:camera_app/widgets/Cards/card_add_new_tag.dart';
-import 'package:camera_app/widgets/image_widget.dart';
+import 'package:camera_app/widgets/ImageWidgets/image_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../db_manager.dart';
+import '../widgets/Dialogs/select_tag_dialog.dart';
 
 const Color galleryBackgroundColor = Colors.white;
 const Color galleryForeroundColor = Colors.black;
@@ -77,7 +77,7 @@ class _GalleryPageState extends State<GalleryPage> {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialogSelectTag(
+        return SelectTagDialog(
           tagsData: tagsData,
           onTagSelectedFunction: getAllRelatedImagesDataWithSelectedTag,
         );

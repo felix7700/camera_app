@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:camera_app/screens/captured_picture.dart';
 import 'package:flutter/material.dart';
 
-import '../db_manager.dart';
+import '../../db_manager.dart';
 
 class ImageWidget extends StatefulWidget {
   const ImageWidget(
