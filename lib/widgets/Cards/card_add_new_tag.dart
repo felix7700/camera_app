@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../db_manager.dart';
+import '../../db_manager.dart';
 
 class CardAddNewTag extends StatelessWidget {
   CardAddNewTag({Key? key, required this.addNewTagFunction}) : super(key: key);

@@ -1,8 +1,8 @@
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:camera_app/constants.dart';
-import 'package:camera_app/widgets/card_add_new_tag.dart';
+import 'package:camera_app/widgets/Alerts/alert_dialog_select_tag_drop_down.dart';
+import 'package:camera_app/widgets/Cards/card_add_new_tag.dart';
 import 'package:camera_app/widgets/image_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -45,69 +45,41 @@ class _GalleryPageState extends State<GalleryPage> {
     return _result;
   }
 
-  Future<void> _showTagFilterDialog() async {
-    List<DropdownMenuItem<dynamic>> tagsListAsDropdownMenuItems = [
-      const DropdownMenuItem(
-        child: Text('Auto'),
-        value: 1,
-      ),
-      const DropdownMenuItem(
-        child: Text('Haus'),
-        value: 2,
-      ),
-    ];
-    tagsListAsDropdownMenuItems = [];
-    var tagsData = await _dbManager.queryAllRowsFromAtable(
-        tableName: _dbManager.tagsTablename);
-    debugPrint('tagsData: ' + tagsData.toString());
-    for (var tagData in tagsData) {
-      tagsListAsDropdownMenuItems.add(
-        DropdownMenuItem(
-          child: Card(
-            elevation: 2.0,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                height: 16.0,
-                width: 128.0,
-                child: Text(
-                  tagData[_dbManager.tagsColumnnameTagName],
-                ),
-              ),
-            ),
-          ),
-          value: tagData[_dbManager.tagsColumnnameTagID],
-        ),
-      );
+  Future<List<dynamic>> getAllRelatedImagesDataWithSelectedTag(
+      {required int selectedTagId}) async {
+    debugPrint('getAllRelatedImagesDataWithSelectedTag()  tagId: ' +
+        selectedTagId.toString());
+    List<Map<String, dynamic>> _imagesTableData = await _dbManager
+        .queryAllRowsFromAtable(tableName: _dbManager.imagesTablename);
+
+    final appDir = await getApplicationDocumentsDirectory();
+    List<dynamic> _result = [];
+
+    for (var imageData in _imagesTableData) {
+      String _imageFileName =
+          imageData[_dbManager.imagesColumnnameImageFileName];
+      String _imagePath = '';
+      if (Platform.isAndroid) {
+        _imagePath = ('${appDir.path}/../cache/$_imageFileName');
+      } else if (Platform.isIOS) {
+        _imagePath = ('${appDir.path}/camera/pictures/$_imageFileName');
+      }
+      _result.add([imageData, _imagePath]);
     }
+
+    return _result;
+  }
+
+  Future<void> _showTagFilterDialog() async {
+    List<Map<String, dynamic>> tagsData = await _dbManager
+        .queryAllRowsFromAtable(tableName: _dbManager.tagsTablename);
+
     return showDialog<void>(
       context: context,
-      // barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Nach Tag filtern'),
-          content: SingleChildScrollView(
-            child: DropdownButton<dynamic>(
-              value: 1,
-              items: tagsListAsDropdownMenuItems,
-              onChanged: (selectedTag) {},
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Abbrechen'),
-              onPressed: () {
-                debugPrint('Tagauswahl abgebrochen');
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Ok'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+        return AlertDialogSelectTag(
+          tagsData: tagsData,
+          onTagSelectedFunction: getAllRelatedImagesDataWithSelectedTag,
         );
       },
     );

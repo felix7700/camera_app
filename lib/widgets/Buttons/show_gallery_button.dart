@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ButtonShowGallery extends StatelessWidget {
-  ButtonShowGallery({Key? key, required this.galleryScreenWidget})
+class ShowGalleryButton extends StatelessWidget {
+  ShowGalleryButton({Key? key, required this.galleryScreenWidget})
       : super(key: key);
   Widget galleryScreenWidget;
 

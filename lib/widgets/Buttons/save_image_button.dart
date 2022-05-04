@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ButtonSaveImage extends StatelessWidget {
-  ButtonSaveImage({Key? key, required this.saveImageFunction})
+class SaveImageButton extends StatelessWidget {
+  SaveImageButton({Key? key, required this.saveImageFunction})
       : super(key: key);
 
   Function saveImageFunction;
