@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:camera_app/constants.dart';
-import 'package:camera_app/widgets/Cards/card_add_new_tag.dart';
+import 'package:camera_app/widgets/Dialogs/add_new_tag_dialog.dart';
 import 'package:camera_app/widgets/ImageWidgets/image_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -22,6 +22,23 @@ class GalleryPage extends StatefulWidget {
 
 class _GalleryPageState extends State<GalleryPage> {
   final DbManager _dbManager = DbManager.instance;
+  late Future<List<dynamic>> resultTableData;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAllImages();
+  }
+
+  void _loadAllImages() {
+    resultTableData = getAllRelatedImagesData();
+  }
+
+  void _loadRelatedImagesFromSelectedTag({required int selectedTagId}) {
+    resultTableData =
+        getAllRelatedImagesDataWithSelectedTag(selectedTagId: selectedTagId);
+    setState(() {});
+  }
 
   Future<List<dynamic>> getAllRelatedImagesData() async {
     List<Map<String, dynamic>> _imagesTableData = await _dbManager
@@ -49,8 +66,11 @@ class _GalleryPageState extends State<GalleryPage> {
       {required int selectedTagId}) async {
     debugPrint('getAllRelatedImagesDataWithSelectedTag()  tagId: ' +
         selectedTagId.toString());
-    List<Map<String, dynamic>> _imagesTableData = await _dbManager
-        .queryAllRowsFromAtable(tableName: _dbManager.imagesTablename);
+    List<Map<String, dynamic>> _imagesTableData =
+        await _dbManager.queryRelatedRowsFromAtable(
+            tableName: _dbManager.imagesTablename,
+            whereColumnName: _dbManager.imagesColumnnameImageTagID,
+            whereColumnValue: selectedTagId);
 
     final appDir = await getApplicationDocumentsDirectory();
     List<dynamic> _result = [];
@@ -79,18 +99,20 @@ class _GalleryPageState extends State<GalleryPage> {
       builder: (BuildContext context) {
         return SelectTagDialog(
           tagsData: tagsData,
-          onTagSelectedFunction: getAllRelatedImagesDataWithSelectedTag,
+          onTagSelectedFunction: _loadRelatedImagesFromSelectedTag,
         );
       },
     );
   }
 
   Future<void> showAddNewTagCard({required BuildContext buildContext}) async {
-    await Navigator.of(buildContext).push(
-      MaterialPageRoute(
-        builder: (buildContext) =>
-            CardAddNewTag(addNewTagFunction: insertAnewTagIntoTagtable),
-      ),
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AddNewTagDialog(
+          addNewTagFunction: insertAnewTagIntoTagtable,
+        );
+      },
     );
   }
 
@@ -105,7 +127,7 @@ class _GalleryPageState extends State<GalleryPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: getAllRelatedImagesData(),
+      future: resultTableData,
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         Widget _widget;
         if (snapshot.hasData) {

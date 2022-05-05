@@ -204,4 +204,15 @@ class DbManager {
         'UPDATE $tableName SET $updateValueColumnName = $updateValue WHERE $whereColumnName = $whereColumnValue');
     return _error;
   }
+
+  Future<List<Map<String, Object?>>> queryRelatedRowsFromAtable({
+    required String tableName,
+    required String whereColumnName,
+    required var whereColumnValue,
+  }) async {
+    Database db = await instance.database;
+    List<Map<String, Object?>> _result = await db.rawQuery(
+        'SELECT * FROM $tableName WHERE $whereColumnName = $whereColumnValue');
+    return _result;
+  }
 }
