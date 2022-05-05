@@ -1,17 +1,18 @@
 import 'dart:io';
 
 import 'package:camera_app/screens/captured_picture.dart';
+import 'package:camera_app/widgets/DropDownButtons/drop_down_button_custom_style.dart';
 import 'package:flutter/material.dart';
 
 import '../../db_manager.dart';
 
 class ImageWidget extends StatefulWidget {
-  const ImageWidget(
-      {Key? key,
-      required this.imageData,
-      required this.imagePath,
-      required this.reloadImagesFunction})
-      : super(key: key);
+  const ImageWidget({
+    Key? key,
+    required this.imageData,
+    required this.imagePath,
+    required this.reloadImagesFunction,
+  }) : super(key: key);
 
   final Map<String, dynamic> imageData;
   final String imagePath;
@@ -24,52 +25,97 @@ class ImageWidget extends StatefulWidget {
 class _ImageWidgetState extends State<ImageWidget> {
   final DbManager _dbManager = DbManager.instance;
   Widget? imageFileWidget;
+  int? _tagId;
+
+  @override
+  void initState() {
+    super.initState();
+    _tagId = widget.imageData[_dbManager.tagsColumnnameTagID];
+  }
+
+  void _setNewTagId(int newTagIdValue) {
+    _tagId = newTagIdValue;
+  }
+
+  void _setNewTagIdToImageDataTagId() async {
+    if (_tagId != null) {
+      int _error = await _dbManager.updateAValueInARow(
+          tableName: _dbManager.imagesTablename,
+          whereColumnName: _dbManager.imagesColumnnameImageID,
+          whereColumnValue:
+              widget.imageData[_dbManager.imagesColumnnameImageID],
+          updateValueColumnName: _dbManager.imagesColumnnameImageTagID,
+          updateValue: _tagId);
+      if (_error == 1) {
+        Navigator.of(context).pop();
+      }
+    }
+  }
 
   Future<void> _showMyDialog() async {
-    List<DropdownMenuItem<dynamic>> tagsListAsDropdownMenuItems = [
-      const DropdownMenuItem(
-        child: Text('tag'),
-        value: 1,
-      ),
-      const DropdownMenuItem(
-        child: Text('tag'),
-        value: 2,
-      ),
-    ];
+    List<Map<String, dynamic>> tagsData = await _dbManager
+        .queryAllRowsFromAtable(tableName: _dbManager.tagsTablename);
 
     return showDialog<void>(
       context: context,
       // barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(
-            'Tag ändern / Bild löschen',
-            style: TextStyle(fontSize: 16),
+          title: const Center(
+            child: Text(
+              'Tag ändern / Bild löschen',
+              style: TextStyle(fontSize: 16),
+            ),
           ),
           content: SingleChildScrollView(
-            child: DropdownButton<dynamic>(
-              value: 1,
-              items: tagsListAsDropdownMenuItems,
-              onChanged: (selectedTag) {},
+            child: Row(
+              children: [
+                const Text('Tag:'),
+                DropDownButtonCustomStyle(
+                  columnNameIdValue: _dbManager.tagsColumnnameTagID,
+                  columnNameTextValue: _dbManager.tagsColumnnameTagName,
+                  selectedValue: _tagId,
+                  tableRows: tagsData,
+                  onValueSelectedFunction: _setNewTagId,
+                ),
+              ],
             ),
           ),
           actions: <Widget>[
-            GestureDetector(
-              onTap: () async {
-                debugPrint('delete image');
-                var error = await _deleteImage();
-                debugPrint('Delete Image Result: ' + error.toString());
-                widget.reloadImagesFunction();
-                setState(() {});
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: const [
-                  Text('Bild löschen'),
-                  SizedBox(width: 10),
-                  Icon(Icons.delete),
-                ],
-              ),
+            Column(
+              children: [
+                GestureDetector(
+                  onTap: () async {
+                    _setNewTagIdToImageDataTagId();
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Text('Tag speichern'),
+                      SizedBox(width: 10),
+                      Icon(Icons.save),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 32),
+                GestureDetector(
+                  onTap: () async {
+                    debugPrint('delete image');
+                    var error = await _deleteImage();
+                    debugPrint('Delete Image Result: ' + error.toString());
+                    widget.reloadImagesFunction();
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Text('Bild löschen'),
+                      SizedBox(width: 10),
+                      Icon(Icons.delete),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
             ),
           ],
         );

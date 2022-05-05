@@ -150,9 +150,11 @@ class _GalleryPageState extends State<GalleryPage> {
                 ),
                 itemCount: snapshot.data.length,
                 itemBuilder: (BuildContext ctx, index) {
+                  Map<String, dynamic> _imageData = snapshot.data[index][0];
+                  String _imagePath = snapshot.data[index][1];
                   return ImageWidget(
-                    imageData: snapshot.data[index][0],
-                    imagePath: snapshot.data[index][1],
+                    imageData: _imageData,
+                    imagePath: _imagePath,
                     reloadImagesFunction: () {
                       setState(() {
                         getAllRelatedImagesData();

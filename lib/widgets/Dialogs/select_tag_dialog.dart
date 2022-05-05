@@ -32,12 +32,17 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
     return AlertDialog(
       title: const Text('Nach Tag filtern'),
       content: SingleChildScrollView(
-        child: DropDownButtonCustomStyle(
-          columnNameIdValue: _dbManager.tagsColumnnameTagID,
-          columnNameTextValue: _dbManager.tagsColumnnameTagName,
-          selectedValue: widget.selectedTagId,
-          tableRows: widget.tagsData,
-          onValueSelectedFunction: setSelectedTagId,
+        child: Row(
+          children: [
+            const Text('Tag:'),
+            DropDownButtonCustomStyle(
+              columnNameIdValue: _dbManager.tagsColumnnameTagID,
+              columnNameTextValue: _dbManager.tagsColumnnameTagName,
+              selectedValue: widget.selectedTagId,
+              tableRows: widget.tagsData,
+              onValueSelectedFunction: setSelectedTagId,
+            ),
+          ],
         ),
       ),
       actions: <Widget>[

@@ -11,7 +11,7 @@ class DropDownButtonCustomStyle extends StatefulWidget {
     required this.columnNameTextValue,
     required this.onValueSelectedFunction,
   }) : super(key: key);
-  int selectedValue;
+  int? selectedValue;
   final List<Map<String, dynamic>> tableRows;
   final String columnNameIdValue;
   final String columnNameTextValue;

@@ -191,4 +191,17 @@ class DbManager {
     }
     return _queryResult;
   }
+
+  Future<int> updateAValueInARow({
+    required String tableName,
+    required String whereColumnName,
+    required var whereColumnValue,
+    required String updateValueColumnName,
+    required var updateValue,
+  }) async {
+    Database db = await instance.database;
+    int _error = await db.rawUpdate(
+        'UPDATE $tableName SET $updateValueColumnName = $updateValue WHERE $whereColumnName = $whereColumnValue');
+    return _error;
+  }
 }
