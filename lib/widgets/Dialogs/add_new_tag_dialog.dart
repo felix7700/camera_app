@@ -50,7 +50,6 @@ class AddNewTagDialog extends StatelessWidget {
                   ),
                   onPressed: () {
                     if (_formKeyCategoryNameInput.currentState!.validate()) {
-                      debugPrint('submitData()');
                       DbManager dbManager = DbManager.instance;
                       Map<String, dynamic> newTagRow = {
                         dbManager.tagsColumnnameTagName:

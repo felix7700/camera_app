@@ -30,7 +30,7 @@ class _ImageWidgetState extends State<ImageWidget> {
   @override
   void initState() {
     super.initState();
-    _tagId = widget.imageData[_dbManager.tagsColumnnameTagID];
+    _tagId = widget.imageData[_dbManager.imagesColumnnameImageTagID];
   }
 
   void _setNewTagId(int newTagIdValue) {
@@ -100,9 +100,7 @@ class _ImageWidgetState extends State<ImageWidget> {
                 const SizedBox(height: 32),
                 GestureDetector(
                   onTap: () async {
-                    debugPrint('delete image');
                     var error = await _deleteImage();
-                    debugPrint('Delete Image Result: ' + error.toString());
                     widget.reloadImagesFunction();
                   },
                   child: Row(
@@ -147,13 +145,9 @@ class _ImageWidgetState extends State<ImageWidget> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onLongPress: (() {
-        debugPrint(
-            'image was longPressed imageData: ' + widget.imageData.toString());
         _showMyDialog();
       }),
       onTap: (() async {
-        debugPrint(
-            'image was clicked imageData: ' + widget.imageData.toString());
         await Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) =>

@@ -65,8 +65,6 @@ class _GalleryPageState extends State<GalleryPage> {
 
   Future<List<dynamic>> getAllRelatedImagesDataWithSelectedTag(
       {required int selectedTagId}) async {
-    debugPrint('getAllRelatedImagesDataWithSelectedTag()  tagId: ' +
-        selectedTagId.toString());
     List<Map<String, dynamic>> _imagesTableData =
         await _dbManager.queryRelatedRowsFromAtable(
             tableName: _dbManager.imagesTablename,
@@ -118,11 +116,8 @@ class _GalleryPageState extends State<GalleryPage> {
   }
 
   insertAnewTagIntoTagtable({required Map<String, dynamic> newTagRow}) async {
-    debugPrint('insertAnewTagIntoTagtable()');
-    debugPrint('newCategoryRow: ' + newTagRow.toString());
     var _result = await _dbManager.insertIntoTable(
         tableName: _dbManager.tagsTablename, row: newTagRow);
-    debugPrint('_result: ' + _result.toString());
   }
 
   @override
@@ -152,7 +147,6 @@ class _GalleryPageState extends State<GalleryPage> {
                 ),
                 IconButton(
                   onPressed: () {
-                    debugPrint('show filter');
                     _showTagFilterDialog();
                   },
                   icon: const Icon(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../DropDownButtonMenuItems/tag_drop_down_button_menu_item.dart';
 
+// ignore: must_be_immutable
 class DropDownButtonCustomStyle extends StatefulWidget {
   DropDownButtonCustomStyle({
     Key? key,
@@ -42,7 +43,6 @@ class _DropDownButtonCustomStyleState extends State<DropDownButtonCustomStyle> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('widget.selectedValue: ' + widget.selectedValue.toString());
     return DropdownButton<dynamic>(
       value: widget.selectedValue,
       items: itemListAsDropdownMenuItems,

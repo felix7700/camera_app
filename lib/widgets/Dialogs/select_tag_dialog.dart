@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../db_manager.dart';
 
+// ignore: must_be_immutable
 class SelectTagDialog extends StatefulWidget {
   SelectTagDialog(
       {Key? key, required this.tagsData, required this.onTagSelectedFunction})
@@ -21,14 +22,10 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
 
   void setSelectedTagId(int selectedTagId) {
     widget.selectedTagId = selectedTagId;
-    debugPrint('setSelectedTagId()  ' + selectedTagId.toString());
   }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint(
-        'build AlertDialog  DropDownButtonCustomStyle  widget.selectedTagId: ' +
-            widget.selectedTagId.toString());
     return AlertDialog(
       title: const Text('Nach Tag filtern'),
       content: SingleChildScrollView(
@@ -49,7 +46,6 @@ class _SelectTagDialogState extends State<SelectTagDialog> {
         TextButton(
           child: const Text('Abbrechen'),
           onPressed: () {
-            debugPrint('Tagauswahl abgebrochen');
             Navigator.of(context).pop();
           },
         ),
