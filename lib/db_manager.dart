@@ -12,7 +12,7 @@ class DbManager {
   final String imagesColumnnameImageID = 'image_id';
   final String imagesColumnnameImageFileName = 'image_filename';
   final String imagesColumnnameImageNickName = 'image_nickname';
-  final String imagesColumnnameImageTagID = 'image_tags';
+  final String imagesColumnnameImageTagID = 'image_tag_id';
 
   final String tagsTablename = 'tags';
   final String tagsColumnnameTagID = 'tag_id';
@@ -25,7 +25,6 @@ class DbManager {
   static Database? _db;
 
   Future<Database> get database async {
-    debugPrint('Future<Database> get database async{}');
     if (_db != null) return _db!;
     // lazily instantiate the db the first time it is accessed
     _db = await _initDatabase();
@@ -39,19 +38,14 @@ class DbManager {
 
   // this opens the database (and creates it if it doesn't exist)
   _initDatabase() async {
-    debugPrint('_initDatabase');
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String dbPath = join(documentsDirectory.path, databaseName);
-    debugPrint(
-        "dbPath to see DB in DBBrowser when using iPhone-Simulator = $dbPath");
-
     return await openDatabase(dbPath,
         version: databaseVersion, onCreate: onCreate);
   }
 
   // SQL code to create the database tables
   Future onCreate(Database db, int version) async {
-    debugPrint('_onCreate');
     _createExampleTableData = true;
 
     await db.execute('''
@@ -59,7 +53,7 @@ class DbManager {
             $imagesColumnnameImageID INTEGER NOT NULL UNIQUE,
             $imagesColumnnameImageFileName TEXT NOT NULL,
             $imagesColumnnameImageNickName TEXT,
-            $imagesColumnnameImageTagID TEXT,
+            $imagesColumnnameImageTagID INTEGER,
             PRIMARY KEY("$imagesColumnnameImageID" AUTOINCREMENT)
           )
           ''');
@@ -81,7 +75,6 @@ class DbManager {
       _resultId = await db.insert(tableName, row);
     } catch (error) {
       // if error contains 'UNIQUE constraint failed', it´s no error, because id its auto increment, when value is null
-      debugPrint('insertIntoTable errorCode : ' + error.toString());
       if (error.toString().contains('UNIQUE constraint failed')) {
         return 0;
       }
@@ -91,21 +84,18 @@ class DbManager {
   }
 
   void dropTable({required tableName}) async {
-    debugPrint('\ndropTable');
     Database db = await instance.database;
     db.execute('DROP TABLE IF EXISTS $tableName');
   }
 
   Future<List<Map<String, dynamic>>> queryAllRowsFromAtable(
       {required String tableName}) async {
-    debugPrint('queryAllRows');
     Database db = await instance.database;
     List<Map<String, dynamic>> result;
 
     try {
       result = await db.query(tableName);
     } catch (e) {
-      debugPrint('error! : ' + e.toString());
       result = e as List<Map<String, dynamic>>;
     }
     return result;
@@ -114,7 +104,6 @@ class DbManager {
   // All of the methods (insert, query, update, delete) can also be done using
   // raw SQL commands. This method uses a raw query to give the row count.
   Future<int?> queryRowCount({required String tableName}) async {
-    debugPrint('queryRowCount');
     Database db = await instance.database;
     return Sqflite.firstIntValue(
       await db.rawQuery('SELECT COUNT(*) FROM $tableName'),
@@ -125,7 +114,6 @@ class DbManager {
       {required String tableName,
       required String columnName,
       required int value}) async {
-    debugPrint('queryItem');
     Database db = await instance.database;
     return await db
         .rawQuery('SELECT * FROM $tableName where $columnName = $value');
@@ -135,8 +123,6 @@ class DbManager {
       {required String tableName,
       required String whereColumnIdName,
       required Map<String, dynamic> rowData}) async {
-    debugPrint('updateRow()');
-
     Database db = await instance.database;
     int id = rowData[whereColumnIdName];
 
@@ -148,14 +134,12 @@ class DbManager {
       {required String tableName,
       required String idColumnname,
       required int id}) async {
-    debugPrint('deleteRow()');
     Database db = await instance.database;
     return await db
         .delete(tableName, where: '$idColumnname = ?', whereArgs: [id]);
   }
 
   Future<int?> isTableExists({required String tableName}) async {
-    debugPrint('isTableExists()');
     Database db = await instance.database;
     return Sqflite.firstIntValue(
       await db.rawQuery('SELECT COUNT(*) FROM $tableName'),
@@ -164,7 +148,6 @@ class DbManager {
 
   Future<int> deleteAllRows(
       {required String tableName, required String idColumnname}) async {
-    debugPrint('\ndeleteAllRows()');
     Database db = await instance.database;
     int? tableExists = 0;
 
@@ -179,7 +162,6 @@ class DbManager {
 
   Future<List<Map<String, Object?>>> rawQuery(
       {required String queryString}) async {
-    debugPrint('rawQuery()');
     Database db = await instance.database;
     List<Map<String, Object?>> _queryResult;
     try {

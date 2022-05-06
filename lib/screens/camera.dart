@@ -117,8 +117,8 @@ class _CameraScreenState extends State<CameraScreen> {
                     children: [
                       SwitchCameraButton(onPressed: _switchCamera),
                       SaveImageButton(saveImageFunction: _saveImage),
-                      ShowGalleryButton(
-                        galleryScreenWidget: const GalleryPage(),
+                      const ShowGalleryButton(
+                        galleryScreenWidget: GalleryPage(),
                       ),
                     ],
                   ),
