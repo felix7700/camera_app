@@ -138,8 +138,8 @@ class _ImageWidgetState extends State<ImageWidget> {
     } catch (e) {
       return 'error deleteRow: ' + e.toString();
     }
+    widget.reloadImagesFunction();
     Navigator.of(context).pop();
-
     return 'no Error';
   }
 

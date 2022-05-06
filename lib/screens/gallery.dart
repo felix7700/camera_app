@@ -32,6 +32,7 @@ class _GalleryPageState extends State<GalleryPage> {
 
   void _loadAllImages() {
     resultTableData = getAllRelatedImagesData();
+    setState(() {});
   }
 
   void _loadRelatedImagesFromSelectedTag({required int selectedTagId}) {
@@ -179,7 +180,7 @@ class _GalleryPageState extends State<GalleryPage> {
                     imagePath: _imagePath,
                     reloadImagesFunction: () {
                       setState(() {
-                        getAllRelatedImagesData();
+                        _loadAllImages();
                       });
                     },
                   );
